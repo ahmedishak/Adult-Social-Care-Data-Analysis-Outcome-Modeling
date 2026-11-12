@@ -1,91 +1,176 @@
 <img width="1657" height="851" alt="Adult Social Care Financial   Outcomes" src="https://github.com/user-attachments/assets/c6557aca-6598-4600-a4ab-7c134d17f616" />
-Adult Social Care: Financial & Outcome Intelligence Suite 📊
-Project Overview
-This project engineers a full-stack analytics pipeline to audit Adult Social Care (ASC) expenditure and service efficacy. By integrating SQL-driven extraction, Power Query ETL, and Tableau visualization, the analysis identifies high-variance spending zones and quantifies the impact of informal care on service user independence.
+# Adult Social Care: Financial & Outcome Intelligence Suite 📊
 
-The objective was to transform raw administrative data into actionable business intelligence to optimize budget allocation and identify "crisis-entry" patterns in specific socio-economic demographics.
+## 📌 Project Overview
 
-Technical Stack
-Database: SQL (Data Normalization, Logical Modeling, & Aggregation)
+This project explores Adult Social Care (ASC) expenditure and service outcomes through an end-to-end data analytics pipeline, combining SQL, Excel Power Query, and Tableau to transform raw administrative data into actionable insights.
 
-ETL & Governance: Excel Power Query (Schema Standardization & Validation)
+The analysis focuses on identifying regional spending variations, exploring relationships between socio-economic deprivation and care costs, and evaluating the impact of informal carer support on individual independence outcomes.
 
-BI & Visualization: Tableau (Interactive Executive Dashboards)
+The primary objective is to support evidence-based decision-making by highlighting areas of financial pressure, identifying potential gaps in preventative care, and informing opportunities for more effective resource allocation across Adult Social Care services.
 
-1. Data Engineering & SQL Logic
-The raw data was extracted and modeled to isolate three primary KPIs: regional spend, socio-economic cost correlation, and carer effectiveness.
+## 🛠️ Technical Stack
 
-A. Regional Expenditure Variance
-Identifies geographical "hotspots" to prioritize regional budget audits.
+| Technology | Purpose |
+|---|---|
+| **SQL** | Data extraction, aggregation, querying and analytical modelling |
+| **Excel Power Query** | Data cleaning, transformation, standardisation and validation |
+| **Tableau** | Interactive dashboards, data visualisation and insight generation |
 
-SQL
-SELECT ward, SUM(weekly_cost_gbp) AS total_weekly_spend 
-FROM care_data 
-GROUP BY ward 
+---
+
+## 1. Data Analysis & SQL Development
+
+SQL was used to extract, aggregate and analyse the underlying dataset, focusing on three key analytical areas.
+
+### A. Regional Expenditure Analysis
+
+Identified geographical variations in weekly care expenditure to highlight potential spending hotspots and areas requiring further financial investigation.
+
+```sql
+SELECT
+    ward,
+    SUM(weekly_cost_gbp) AS total_weekly_spend
+FROM care_data
+GROUP BY ward
 ORDER BY total_weekly_spend DESC;
-B. Socio-Economic Cost Correlation
-Analyzes the "unit cost" of care relative to the Index of Multiple Deprivation (IMD).
+```
 
-SQL
-SELECT deprivation_decile, AVG(weekly_cost_gbp) AS average_weekly_cost 
-FROM care_data 
-GROUP BY deprivation_decile 
+### B. Socio-Economic Cost Analysis
+
+Examined the relationship between Index of Multiple Deprivation (IMD) deciles and average weekly care expenditure to understand how care costs vary across different socio-economic groups.
+
+```sql
+SELECT
+    deprivation_decile,
+    AVG(weekly_cost_gbp) AS average_weekly_cost
+FROM care_data
+GROUP BY deprivation_decile
 ORDER BY deprivation_decile ASC;
-C. Outcome Efficacy Matrix
-Quantifies the success rate of independence outcomes based on carer presence.
+```
 
-SQL
-SELECT carer_flag, outcome_improved_independence, COUNT(person_id) AS resident_count 
-FROM care_data 
-GROUP BY carer_flag, outcome_improved_independence 
+### C. Care Outcome Effectiveness
+
+Investigated the relationship between recorded carer support and improved independence outcomes, using resident counts to compare outcome distributions.
+
+```sql
+SELECT
+    carer_flag,
+    outcome_improved_independence,
+    COUNT(person_id) AS resident_count
+FROM care_data
+GROUP BY
+    carer_flag,
+    outcome_improved_independence
 ORDER BY resident_count DESC;
-2. ETL Pipeline & Data Governance
-Before visualization, data underwent a rigorous ETL process in Power Query to ensure a "Single Version of Truth" (SVOT):
+```
 
-Categorical Normalization: Consolidated 12+ fragmented string variations of "Independence Outcomes" into a standardized 3-tier ordinal scale (Yes | Partial | No).
+---
 
-Type Casting: Cast Deprivation_Decile as an integer to allow for continuous trend-line slope analysis.
+## 2. Data Transformation & Governance
 
-Integrity Validation: Performed row-count and grand-total cross-checks against raw SQL outputs to verify zero data loss during ingestion.
+Excel Power Query was used as the primary ETL (Extract, Transform, Load) tool to prepare and standardise the dataset before its integration into Tableau.
 
-3. Interactive Visualization (Tableau)
-The dashboard provides an executive-level overview of the care landscape:
+The transformation process focused on improving data consistency, analytical accuracy and reporting reliability.
 
-Geographical Expenditure Map: A spatial audit of total spending across wards.
+### Key Transformation Activities
 
-Deprivation Trend Analysis: A visualization of average weekly costs across the 1–10 decile range.
+- **Source Integration:** Imported structured SQL outputs in CSV format to establish a repeatable data preparation workflow.
+- **Categorical Standardisation:** Consolidated over 12 variations of independence outcome descriptions into a consistent three-category classification: `Yes`, `Partial` and `No`.
+- **Data Type Standardisation:** Converted deprivation deciles into integer values and standardised financial fields to support accurate numerical analysis.
+- **Geographical Normalisation:** Cleaned inconsistent ward naming conventions to ensure geographical data was consistently categorised.
+- **Feature Engineering:** Created standardised binary classifications for carer status to support comparative outcome analysis.
+- **Missing Value Management:** Reviewed missing values in deprivation and carer status fields to minimise their impact on analytical results.
+- **Data Integrity Validation:** Compared row counts and aggregate totals against the original SQL outputs to verify data consistency throughout the ETL process.
 
-Outcome Heatmap: A matrix correlating carer support with independence success rates.
+These steps established a consistent analytical dataset and reduced inconsistencies in the final reporting process.
 
-4. ETL & Data Transformation (Excel Power Query)
-While SQL was used for high-level extraction, Excel Power Query served as the primary ETL (Extract, Transform, Load) engine to ensure a "Single Version of Truth" before data was visualized in Tableau.
+---
 
-Technical Workflow & Data Governance:
+## 3. Interactive Tableau Dashboard
 
-Source Integration: Connected directly to raw SQL outputs (CSV format) to build a repeatable transformation pipeline.
+An interactive Tableau dashboard was developed to communicate the financial and service outcome findings through accessible visualisations.
 
-Schema Standardization: Enforced strict data types for currency and ordinal dimensions, ensuring the Deprivation Decile trend-line was mathematically accurate.
+### Dashboard Components
 
-Categorical Consolidation: Utilized conditional logic to merge 12+ fragmented "Independence Outcome" strings into a standardized 3-tier scale (Yes | Partial | No), reducing reporting noise by 40%.
+**📍 Geographical Expenditure Map**
 
-Data Integrity Validation: Implemented row-count validation protocols to verify 100% data parity between the initial SQL extraction and the final Tableau Data Source.
-Transformation Logic Applied:
-Normalization: Cleaned inconsistent naming conventions within the Ward column (e.g., standardizing "Reddish North" and "Reddish South") to ensure geographical accuracy.
+A ward-level representation of total weekly Adult Social Care expenditure, highlighting geographical concentrations of spending and potential areas for further investigation.
 
-Feature Engineering: Developed standardized flags for Carer Status to transform unstructured administrative entries into a binary classification for outcome testing.
+**📈 Deprivation & Cost Analysis**
 
-Null Value Handling: Strategically managed missing entries in the Deprivation_Decile and Carer_Flag fields to prevent skewed averages in the final financial models.
+A trend analysis comparing average weekly care expenditure across IMD deprivation deciles (1–10), exploring variations in spending across socio-economic groups.
 
-4. Key Strategic Findings
-The "Hazel Grove" Outlier: Identified a significant financial concentration in Hazel Grove (£9,045/week), triggering a recommendation for a provider-rate audit.
+**🔥 Independence Outcome Heatmap**
 
-The Decile 7 Paradox: Costs do not scale linearly with poverty; a significant peak occurs at Decile 7 (£819 avg), suggesting middle-income residents enter the system at "crisis points" rather than through preventative care.
+A comparative visualisation examining the relationship between informal carer support and recorded independence outcomes.
 
-Carer ROI: Residents with recorded carers demonstrated a statistically higher likelihood of achieving improved independence, providing a fiscal evidence base for continued Carer Support Grants.
+The dashboard brings together financial and operational indicators to support more informed strategic decision-making.
 
-5. Future Roadmap
-Live Integration: Transition from static flat-files to a live SQL Server connection.
+---
 
-Predictive Modeling: Utilize historical spend data to forecast 2026/27 budget requirements.
+## 4. Key Findings & Strategic Insights
 
-Data Quality: Implement CRM field validation to eliminate the 22% reporting gap in carer status documentation.
+The analysis identified several patterns with potential implications for Adult Social Care commissioning, financial planning and preventative services.
+
+### 1. Hazel Grove – Regional Spending Outlier
+
+Hazel Grove recorded the highest identified weekly expenditure concentration at **£9,045 per week**.
+
+This highlights a potential area for further investigation, including provider-rate comparisons, service demand and the distribution of care packages.
+
+**Strategic implication:** Consider a targeted review of commissioning arrangements and local expenditure drivers.
+
+### 2. The Deprivation Decile 7 Spending Peak
+
+Average weekly care expenditure peaked at **£819 in deprivation decile 7**, challenging the assumption that care expenditure necessarily increases in line with deprivation.
+
+This suggests that care demand and associated costs may be influenced by additional factors, including service accessibility, individual circumstances and the timing of intervention.
+
+**Strategic implication:** Further investigate whether residents in less deprived areas are accessing services at later stages of need, potentially indicating opportunities for earlier intervention.
+
+### 3. Informal Carer Support & Independence Outcomes
+
+Residents with recorded carer support demonstrated a higher likelihood of achieving improved independence outcomes within the dataset.
+
+This highlights the potential contribution of informal care networks to maintaining independence and supporting individuals receiving Adult Social Care services.
+
+**Strategic implication:** Strengthen the evidence base for carer support initiatives and consider the role of informal care in longer-term service planning.
+
+*Note: These findings identify associations within the dataset and should not be interpreted as proof of causation.*
+
+---
+
+## 5. Future Development Roadmap
+
+Several opportunities have been identified to extend the project beyond retrospective analysis.
+
+| Development Area | Proposed Enhancement |
+|---|---|
+| **Live Data Integration** | Replace static CSV imports with a live SQL Server connection to support more frequent reporting. |
+| **Predictive Analytics** | Develop forecasting models using historical expenditure patterns to support 2026/27 budget planning. |
+| **Data Quality Improvement** | Investigate the 22% gap in recorded carer status and introduce improved data validation processes. |
+| **Advanced Analytics** | Explore additional relationships between deprivation, service demand, expenditure and independence outcomes. |
+
+---
+
+## 6. Skills Demonstrated
+
+This project demonstrates practical experience across the data analytics lifecycle, including:
+
+- SQL querying, aggregation and analytical data modelling.
+- ETL development and transformation using Excel Power Query.
+- Data cleaning, standardisation and quality assurance.
+- Socio-economic and financial data analysis.
+- KPI development and comparative analysis.
+- Interactive dashboard development using Tableau.
+- Translating analytical findings into actionable business recommendations.
+- Communicating complex data insights to support strategic decision-making.
+
+---
+
+## 🎯 Project Outcome
+
+The Adult Social Care Financial & Outcome Intelligence Suite demonstrates how fragmented administrative data can be transformed into meaningful financial and operational intelligence.
+
+By combining SQL-based analysis, structured ETL processes and interactive Tableau reporting, the project provides a framework for exploring expenditure patterns, understanding service outcomes and identifying opportunities to improve resource allocation and service planning.
